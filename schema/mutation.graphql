@@ -1,0 +1,43 @@
+type Mutation {
+  # Create a new user
+  createUser(input: CreateUserInput!): UserResponse!
+
+  # Update an existing user
+  updateUser(input: UpdateUserInput!): UserResponse!
+
+  # Delete a user
+  deleteUser(id: ID!): BaseResponse!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  age: Int
+}
+
+input UpdateUserInput {
+  id: ID!
+  name: String
+  email: String
+  age: Int
+}
+
+type BaseResponse {
+  success: Boolean!
+  message: String!
+}
+
+type UserResponse {
+  success: Boolean!
+  message: String!
+  user: User
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  age: Int
+  created_at: String!
+  updated_at: String!
+}

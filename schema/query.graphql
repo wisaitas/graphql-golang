@@ -1,0 +1,19 @@
+type Query {
+  # Simple hello world query
+  hello(name: String): String
+
+  # Get all users
+  users: [User!]!
+
+  # Get user by ID
+  user(id: ID!): User
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  age: Int
+  created_at: String!
+  updated_at: String!
+}
