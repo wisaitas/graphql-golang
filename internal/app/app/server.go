@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/graphql-go/graphql"
-	appConf "github.com/wisaitas/graphql-golang/internal/app"
+	"github.com/wisaitas/graphql-golang/internal/app/schema"
 )
 
 // GraphQLRequest โครงสร้างสำหรับ GraphQL request
@@ -22,7 +22,7 @@ type Server struct {
 
 // NewServer สร้าง server instance ใหม่
 func NewServer() (*Server, error) {
-	schema, err := appConf.CreateSchema()
+	schema, err := schema.CreateSchema()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create schema: %v", err)
 	}
@@ -70,50 +70,50 @@ func (s *Server) GraphQLHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-// GraphiQLHandler handler สำหรับ GraphiQL interface
-func (s *Server) GraphiQLHandler(w http.ResponseWriter, r *http.Request) {
-	html := `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>GraphiQL</title>
-    <link href="https://unpkg.com/graphiql@3.0.6/graphiql.min.css" rel="stylesheet" />
-</head>
-<body style="margin: 0;">
-    <div id="graphiql" style="height: 100vh;"></div>
-    <script
-        crossorigin
-        src="https://unpkg.com/react@18/umd/react.production.min.js"
-    ></script>
-    <script
-        crossorigin
-        src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
-    ></script>
-    <script
-        crossorigin
-        src="https://unpkg.com/graphiql@3.0.6/graphiql.min.js"
-    ></script>
-    <script>
-        const fetcher = GraphiQL.createFetcher({ url: '/graphql' });
-        const root = ReactDOM.createRoot(document.getElementById('graphiql'));
-        root.render(React.createElement(GraphiQL, { fetcher: fetcher }));
-    </script>
-</body>
-</html>`
-	w.Header().Set("Content-Type", "text/html")
-	w.Write([]byte(html))
-}
+// // GraphiQLHandler handler สำหรับ GraphiQL interface
+// func (s *Server) GraphiQLHandler(w http.ResponseWriter, r *http.Request) {
+// 	html := `
+// <!DOCTYPE html>
+// <html>
+// <head>
+//     <title>GraphiQL</title>
+//     <link href="https://unpkg.com/graphiql@3.0.6/graphiql.min.css" rel="stylesheet" />
+// </head>
+// <body style="margin: 0;">
+//     <div id="graphiql" style="height: 100vh;"></div>
+//     <script
+//         crossorigin
+//         src="https://unpkg.com/react@18/umd/react.production.min.js"
+//     ></script>
+//     <script
+//         crossorigin
+//         src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+//     ></script>
+//     <script
+//         crossorigin
+//         src="https://unpkg.com/graphiql@3.0.6/graphiql.min.js"
+//     ></script>
+//     <script>
+//         const fetcher = GraphiQL.createFetcher({ url: '/graphql' });
+//         const root = ReactDOM.createRoot(document.getElementById('graphiql'));
+//         root.render(React.createElement(GraphiQL, { fetcher: fetcher }));
+//     </script>
+// </body>
+// </html>`
+// 	w.Header().Set("Content-Type", "text/html")
+// 	w.Write([]byte(html))
+// }
 
 // Start เริ่มต้น HTTP server
 func (s *Server) Start(port string) error {
 	http.HandleFunc("/graphql", s.GraphQLHandler)
-	http.HandleFunc("/graphiql", s.GraphiQLHandler)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "/graphiql", http.StatusFound)
-	})
+	// http.HandleFunc("/graphiql", s.GraphiQLHandler)
+	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	// 	http.Redirect(w, r, "/graphiql", http.StatusFound)
+	// })
 
 	fmt.Printf("🚀 GraphQL server running at http://localhost%s\n", port)
-	fmt.Printf("📊 GraphiQL interface at http://localhost%s/graphiql\n", port)
+	// fmt.Printf("📊 GraphiQL interface at http://localhost%s/graphiql\n", port)
 
 	return http.ListenAndServe(port, nil)
 }
