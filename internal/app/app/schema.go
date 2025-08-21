@@ -5,8 +5,8 @@ import (
 	appSchema "github.com/wisaitas/graphql-golang/internal/app/schema"
 )
 
-func newSchema(resolver *resolver, types *Type) graphql.Schema {
-	userSchema := appSchema.NewUserSchema(resolver.userResolver, types.UserType)
+func newSchema(resolver *resolver, graphqlType *graphqlType) graphql.Schema {
+	userSchema := appSchema.NewUserSchema(resolver.userResolver, graphqlType.UserType)
 
 	queryFields := graphql.Fields{}
 

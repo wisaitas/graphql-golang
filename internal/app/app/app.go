@@ -12,8 +12,8 @@ import (
 func NewApp() {
 	service := newService()
 	resolver := newResolver(service)
-	types := newType()
-	schema := newSchema(resolver, types)
+	graphqlType := newGraphqlType()
+	schema := newSchema(resolver, graphqlType)
 
 	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
 		graphQLHandler(w, r, schema)

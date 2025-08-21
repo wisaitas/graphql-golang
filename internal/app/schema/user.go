@@ -2,7 +2,7 @@ package schema
 
 import (
 	"github.com/graphql-go/graphql"
-	gqlTypes "github.com/wisaitas/graphql-golang/internal/app/graphql"
+	"github.com/wisaitas/graphql-golang/internal/app/graphqltype"
 	"github.com/wisaitas/graphql-golang/internal/app/resolver"
 )
 
@@ -13,7 +13,7 @@ type UserSchema struct {
 
 func NewUserSchema(
 	userResolver resolver.UserResolver,
-	userType *gqlTypes.UserType,
+	userType *graphqltype.UserType,
 ) *UserSchema {
 	return &UserSchema{
 		Queries: graphql.Fields{
