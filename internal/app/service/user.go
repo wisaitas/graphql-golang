@@ -57,7 +57,7 @@ func (s *UserService) GetUserByID(id string) (*model.User, error) {
 }
 
 // CreateUser สร้างผู้ใช้ใหม่
-func (s *UserService) CreateUser(input *model.CreateUserInput) (*model.User, error) {
+func (s *UserService) CreateUser(input *model.User) (*model.User, error) {
 	// ตรวจสอบข้อมูล
 	if input.Name == "" {
 		return nil, fmt.Errorf("name is required")
@@ -83,21 +83,21 @@ func (s *UserService) CreateUser(input *model.CreateUserInput) (*model.User, err
 }
 
 // UpdateUser อัพเดทข้อมูลผู้ใช้
-func (s *UserService) UpdateUser(input *model.UpdateUserInput) (*model.User, error) {
+func (s *UserService) UpdateUser(input *model.User) (*model.User, error) {
 	user, exists := s.users[input.ID]
 	if !exists {
 		return nil, fmt.Errorf("user with id %s not found", input.ID)
 	}
 
 	// อัพเดทข้อมูลเฉพาะที่ส่งมา
-	if input.Name != nil {
-		user.Name = *input.Name
+	if input.Name != "" {
+		user.Name = input.Name
 	}
-	if input.Email != nil {
-		user.Email = *input.Email
+	if input.Email != "" {
+		user.Email = input.Email
 	}
-	if input.Age != nil {
-		user.Age = *input.Age
+	if input.Age != 0 {
+		user.Age = input.Age
 	}
 	user.UpdatedAt = time.Now()
 

@@ -1,25 +1,46 @@
 package resolver
 
 import (
+	"fmt"
+
 	"github.com/graphql-go/graphql"
 	"github.com/wisaitas/graphql-golang/internal/app/model"
 	"github.com/wisaitas/graphql-golang/internal/app/service"
 )
 
-// MutationResolver สำหรับ GraphQL mutations
-type MutationResolver struct {
+type UserResolver interface {
+	Users(p graphql.ResolveParams) (interface{}, error)
+	User(p graphql.ResolveParams) (interface{}, error)
+	CreateUser(p graphql.ResolveParams) (interface{}, error)
+	UpdateUser(p graphql.ResolveParams) (interface{}, error)
+	DeleteUser(p graphql.ResolveParams) (interface{}, error)
+}
+
+type userResolver struct {
 	userService *service.UserService
 }
 
-// NewMutationResolver สร้าง MutationResolver ใหม่
-func NewMutationResolver(userService *service.UserService) *MutationResolver {
-	return &MutationResolver{
+func NewUserResolver(
+	userService *service.UserService,
+) UserResolver {
+	return &userResolver{
 		userService: userService,
 	}
 }
 
-// CreateUser resolver สำหรับ createUser mutation
-func (r *MutationResolver) CreateUser(p graphql.ResolveParams) (interface{}, error) {
+func (r *userResolver) Users(p graphql.ResolveParams) (interface{}, error) {
+	return r.userService.GetAllUsers()
+}
+
+func (r *userResolver) User(p graphql.ResolveParams) (interface{}, error) {
+	id, ok := p.Args["id"].(string)
+	if !ok {
+		return nil, fmt.Errorf("id is required")
+	}
+	return r.userService.GetUserByID(id)
+}
+
+func (r *userResolver) CreateUser(p graphql.ResolveParams) (interface{}, error) {
 	input, ok := p.Args["input"].(map[string]interface{})
 	if !ok {
 		return &model.UserResponse{
@@ -28,7 +49,7 @@ func (r *MutationResolver) CreateUser(p graphql.ResolveParams) (interface{}, err
 		}, nil
 	}
 
-	createInput := &model.CreateUserInput{}
+	createInput := &model.User{}
 
 	if name, ok := input["name"].(string); ok {
 		createInput.Name = name
@@ -56,7 +77,7 @@ func (r *MutationResolver) CreateUser(p graphql.ResolveParams) (interface{}, err
 }
 
 // UpdateUser resolver สำหรับ updateUser mutation
-func (r *MutationResolver) UpdateUser(p graphql.ResolveParams) (interface{}, error) {
+func (r *userResolver) UpdateUser(p graphql.ResolveParams) (interface{}, error) {
 	input, ok := p.Args["input"].(map[string]interface{})
 	if !ok {
 		return &model.UserResponse{
@@ -65,19 +86,19 @@ func (r *MutationResolver) UpdateUser(p graphql.ResolveParams) (interface{}, err
 		}, nil
 	}
 
-	updateInput := &model.UpdateUserInput{}
+	updateInput := &model.User{}
 
 	if id, ok := input["id"].(string); ok {
 		updateInput.ID = id
 	}
 	if name, ok := input["name"].(string); ok {
-		updateInput.Name = &name
+		updateInput.Name = name
 	}
 	if email, ok := input["email"].(string); ok {
-		updateInput.Email = &email
+		updateInput.Email = email
 	}
 	if age, ok := input["age"].(int); ok {
-		updateInput.Age = &age
+		updateInput.Age = age
 	}
 
 	user, err := r.userService.UpdateUser(updateInput)
@@ -96,7 +117,7 @@ func (r *MutationResolver) UpdateUser(p graphql.ResolveParams) (interface{}, err
 }
 
 // DeleteUser resolver สำหรับ deleteUser mutation
-func (r *MutationResolver) DeleteUser(p graphql.ResolveParams) (interface{}, error) {
+func (r *userResolver) DeleteUser(p graphql.ResolveParams) (interface{}, error) {
 	id, ok := p.Args["id"].(string)
 	if !ok {
 		return &model.BaseResponse{
