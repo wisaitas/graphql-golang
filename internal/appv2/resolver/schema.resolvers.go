@@ -6,20 +6,50 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/wisaitas/graphql-golang/internal/appv2/graph"
 	"github.com/wisaitas/graphql-golang/internal/appv2/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
+	return r.UserService.CreateUser(input)
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, id string, input model.UpdateUserInput) (*model.User, error) {
+	return r.UserService.UpdateUser(id, input)
+}
+
+// DeleteUser is the resolver for the deleteUser field.
+func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (bool, error) {
+	err := r.UserService.DeleteUser(id)
+	return err == nil, err
+}
+
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	users, err := r.UserService.GetAllUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert []model.User to []*model.User
+	result := make([]*model.User, len(users))
+	for i, user := range users {
+		result[i] = &user
+	}
+	return result, nil
+}
+
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	return r.UserService.GetUserByID(id)
+}
+
+// UserByEmail is the resolver for the userByEmail field.
+func (r *queryResolver) UserByEmail(ctx context.Context, email string) (*model.User, error) {
+	return r.UserService.GetUserByEmail(email)
 }
 
 // Mutation returns graph.MutationResolver implementation.
