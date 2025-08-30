@@ -5,6 +5,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/wisaitas/graphql-golang/internal/app/model"
+	"github.com/wisaitas/graphql-golang/internal/app/response"
 	"github.com/wisaitas/graphql-golang/internal/app/service"
 )
 
@@ -43,9 +44,11 @@ func (r *userResolver) User(p graphql.ResolveParams) (interface{}, error) {
 func (r *userResolver) CreateUser(p graphql.ResolveParams) (interface{}, error) {
 	input, ok := p.Args["input"].(map[string]interface{})
 	if !ok {
-		return &model.UserResponse{
-			Success: false,
-			Message: "Invalid input",
+		return &response.UserResponse{
+			BaseResponse: response.BaseResponse{
+				Success: false,
+				Message: "Invalid input",
+			},
 		}, nil
 	}
 
@@ -63,16 +66,20 @@ func (r *userResolver) CreateUser(p graphql.ResolveParams) (interface{}, error) 
 
 	user, err := r.userService.CreateUser(createInput)
 	if err != nil {
-		return &model.UserResponse{
-			Success: false,
-			Message: err.Error(),
+		return &response.UserResponse{
+			BaseResponse: response.BaseResponse{
+				Success: false,
+				Message: err.Error(),
+			},
 		}, nil
 	}
 
-	return &model.UserResponse{
-		Success: true,
-		Message: "User created successfully",
-		User:    user,
+	return &response.UserResponse{
+		BaseResponse: response.BaseResponse{
+			Success: true,
+			Message: "User created successfully",
+		},
+		User: user,
 	}, nil
 }
 
@@ -80,9 +87,11 @@ func (r *userResolver) CreateUser(p graphql.ResolveParams) (interface{}, error) 
 func (r *userResolver) UpdateUser(p graphql.ResolveParams) (interface{}, error) {
 	input, ok := p.Args["input"].(map[string]interface{})
 	if !ok {
-		return &model.UserResponse{
-			Success: false,
-			Message: "Invalid input",
+		return &response.UserResponse{
+			BaseResponse: response.BaseResponse{
+				Success: false,
+				Message: "Invalid input",
+			},
 		}, nil
 	}
 
@@ -103,16 +112,20 @@ func (r *userResolver) UpdateUser(p graphql.ResolveParams) (interface{}, error) 
 
 	user, err := r.userService.UpdateUser(updateInput)
 	if err != nil {
-		return &model.UserResponse{
-			Success: false,
-			Message: err.Error(),
+		return &response.UserResponse{
+			BaseResponse: response.BaseResponse{
+				Success: false,
+				Message: err.Error(),
+			},
 		}, nil
 	}
 
-	return &model.UserResponse{
-		Success: true,
-		Message: "User updated successfully",
-		User:    user,
+	return &response.UserResponse{
+		BaseResponse: response.BaseResponse{
+			Success: true,
+			Message: "User updated successfully",
+		},
+		User: user,
 	}, nil
 }
 
@@ -120,7 +133,7 @@ func (r *userResolver) UpdateUser(p graphql.ResolveParams) (interface{}, error) 
 func (r *userResolver) DeleteUser(p graphql.ResolveParams) (interface{}, error) {
 	id, ok := p.Args["id"].(string)
 	if !ok {
-		return &model.BaseResponse{
+		return &response.BaseResponse{
 			Success: false,
 			Message: "ID is required",
 		}, nil
@@ -128,13 +141,13 @@ func (r *userResolver) DeleteUser(p graphql.ResolveParams) (interface{}, error) 
 
 	err := r.userService.DeleteUser(id)
 	if err != nil {
-		return &model.BaseResponse{
+		return &response.BaseResponse{
 			Success: false,
 			Message: err.Error(),
 		}, nil
 	}
 
-	return &model.BaseResponse{
+	return &response.BaseResponse{
 		Success: true,
 		Message: "User deleted successfully",
 	}, nil

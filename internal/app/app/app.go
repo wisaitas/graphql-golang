@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/graphql-go/graphql"
+	"github.com/wisaitas/graphql-golang/internal/app/middleware/config"
 )
 
 func NewApp() {
@@ -31,15 +32,7 @@ type graphQLRequest struct {
 }
 
 func graphQLHandler(w http.ResponseWriter, r *http.Request, schema graphql.Schema) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Content-Type", "application/json")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	config.NewCORS(r)
 
 	var req graphQLRequest
 
@@ -62,69 +55,11 @@ func graphQLHandler(w http.ResponseWriter, r *http.Request, schema graphql.Schem
 		VariableValues: req.Variables,
 	})
 
-	json.NewEncoder(w).Encode(result)
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
-
-// // GraphQLRequest โครงสร้างสำหรับ GraphQL request
-// type GraphQLRequest struct {
-// 	Query     string                 `json:"query"`
-// 	Variables map[string]interface{} `json:"variables,omitempty"`
-// }
-
-// // Server โครงสร้างสำหรับ GraphQL server
-// type Server struct {
-// 	Schema graphql.Schema
-// }
-
-// // NewServer สร้าง server instance ใหม่
-// func NewServer() (*Server, error) {
-// 	schema, err := schema.CreateSchema()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to create schema: %v", err)
-// 	}
-
-// 	return &Server{Schema: schema}, nil
-// }
-
-// // GraphQLHandler handler สำหรับ GraphQL endpoint
-// func (s *Server) GraphQLHandler(w http.ResponseWriter, r *http.Request) {
-// 	// ตั้งค่า CORS headers
-// 	w.Header().Set("Access-Control-Allow-Origin", "*")
-// 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-// 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-// 	w.Header().Set("Content-Type", "application/json")
-
-// 	// จัดการ OPTIONS request สำหรับ CORS
-// 	if r.Method == "OPTIONS" {
-// 		w.WriteHeader(http.StatusOK)
-// 		return
-// 	}
-
-// 	var req GraphQLRequest
-
-// 	// รองรับทั้ง GET และ POST
-// 	if r.Method == "GET" {
-// 		req.Query = r.URL.Query().Get("query")
-// 	} else if r.Method == "POST" {
-// 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-// 			http.Error(w, "Invalid JSON", http.StatusBadRequest)
-// 			return
-// 		}
-// 	} else {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
-
-// 	// รัน GraphQL query
-// 	result := graphql.Do(graphql.Params{
-// 		Schema:         s.Schema,
-// 		RequestString:  req.Query,
-// 		VariableValues: req.Variables,
-// 	})
-
-// 	// ส่งผลลัพธ์กลับ
-// 	json.NewEncoder(w).Encode(result)
-// }
 
 // // // GraphiQLHandler handler สำหรับ GraphiQL interface
 // // func (s *Server) GraphiQLHandler(w http.ResponseWriter, r *http.Request) {
